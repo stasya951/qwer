@@ -115,3 +115,43 @@ let form = document.querySelector("#search-form");
 form.addEventListener("submit", handleSubmit);
 
 search("New York");
+
+async function getWeather(city) {
+  try {
+    const response = await axios.get(
+      `https://api.weatherapi.com/v1/current.json?key=YOUR_API_KEY&q=${city}`
+    );
+
+   
+    const { temp_c, humidity, wind_kph, condition, last_updated } =
+      response.data.current;
+
+   
+    document.getElementById("city").textContent = city;
+    document.getElementById("temperature").textContent = temp_c;
+    document.getElementById("humidity").textContent = humidity;
+    document.getElementById("wind").textContent = wind_kph;
+    document.getElementById("description").textContent = condition.text;
+    document.getElementById("date").textContent = last_updated;
+
+   
+    const icon = document.getElementById("icon");
+    icon.src = condition.icon;
+    icon.alt = condition.text;
+
+    const forecastResponse = await axios.get(
+      `https://api.weatherapi.com/v1/forecast.json?key=YOUR_API_KEY&q=${city}&days=3`
+    );
+    const forecastData = forecastResponse.data.forecast.forecastday;
+    displayForecast(forecastData);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+function displayForecast(forecastData) {
+  const forecastElement = document.getElementById("forecast");
+  forecastElement.innerHTML = "";
+
+  forecastData.forEach((day) =>
